@@ -6,7 +6,7 @@
 
 void *dlopen_safe(char const*const file, int const mode) {
     void *lib = NULL;
-    lib = dlopen(file, RTLD_NOW);
+    lib = dlopen(file, mode);
     assert (lib != NULL); 
     return lib;
 }
@@ -18,3 +18,8 @@ void *dlsym_safe(void *restrict const handle, char *restrict const name) {
     assert (ptr != NULL);
     return ptr;
 }
+
+
+#define LOAD_FUNC(name)\
+name##_t name = (name##_t)dlsym_safe(libgame, "##name##")
+

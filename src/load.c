@@ -18,8 +18,3 @@ void *dlsym_safe(void *restrict const handle, char *restrict const name) {
     assert (ptr != NULL);
     return ptr;
 }
-
-
-#define LOAD_FUNC(name)\
-name##_t name = (name##_t)dlsym_safe(libgame, "##name##")
-

@@ -15,6 +15,7 @@
 #define Y_AXIS 1UL
 #define EDGE_SIZE 4UL
 #define MAX_NUM_ROTATIONS 4UL
+#define NEW_BLOCK_POSITIONS {{0, 0}, {0, 0}, {0, 0}, {0, 0}}
 
 typedef enum {
     L_PIECE,
@@ -28,13 +29,19 @@ typedef enum {
 } TetrominoType;
 
 static TetrominoType const first_random_tetromino = L_PIECE;
-static TetrominoType const last_random_tetromino  = S_PIECE;
+static TetrominoType const last_random_tetromino  = S_PIECE; 
 
+typedef enum {
+    MOVE_UP,
+    MOVE_DOWN,
+    MOVE_LEFT,
+    MOVE_RIGHT
+} MoveDirection;
 
 typedef struct {
     size_t x; // must be between 0-cols
     size_t y; // must be between 0-rows
-    size_t rotation; // must always be between 0-3
+    unsigned char rotation; // must always be between 0-3
     TetrominoType type; // the actual type
     size_t positions[NUM_TETROMINO_BLOCKS][NUM_AXIS];
 } Tetromino;
@@ -42,12 +49,15 @@ typedef struct {
 typedef struct {
     Tetromino current_tetromino;
     TetrominoType next_tetromino;
-    TetrominoType board[ROWS][COLS]; // to be clear TetrominoType is used for block color
+    TetrominoType board[ROWS][COLS]; // to be clear TetrominoType is used for
+                                     // block color
     size_t level;
     size_t score;
+    unsigned long long frame_number;
+    size_t wait_time;
 } GameState;
 
-typedef GameState (*init_gamestate_t)(void);
+typedef GameState (*init_gamestate_t)(size_t);
 typedef void (*next_gamestate_t)(GameState*);
 typedef void (*display_game_t)(GameState*);
   

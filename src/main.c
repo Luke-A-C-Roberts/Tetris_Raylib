@@ -22,8 +22,9 @@ int main(void) {
     SetTargetFPS(FPS);
 
     // Gamestate object holds all game objects, and gameloop updates it each cycle
-    GameState game_state = init_gamestate();
+    GameState game_state = init_gamestate(1UL);
     while (!WindowShouldClose()) {
+        double const time = GetTime();
         if (IsKeyPressed(KEY_R)) {
             printf("============== Hot Reload =============\n\n");
 
@@ -37,11 +38,13 @@ int main(void) {
             RELOAD_FUNC(display_game);
 
             // DEBUG: refresh game state (optional)
-            game_state = init_gamestate();
+            game_state = init_gamestate(1UL);
         }
 
         next_gamestate(&game_state); // Update game state
         display_game(&game_state);   // Take gamestate and render it
+        double const time_delta = GetTime() - time;
+        WaitTime(1. / GetFPS() - time_delta);
     }
     CloseWindow();
     dlclose(libgame);

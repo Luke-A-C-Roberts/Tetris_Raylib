@@ -451,15 +451,13 @@ inline void _disp_boarders(void) {
 
 inline void _disp_blocks(TetrominoType const board[ROWS][COLS]) {
     for (size_t y = 0; y < ROWS; ++y) {
-        for (size_t x = 0; x < COLS; ++x) {
-            DrawRectangle(
-                x * BLOCK_SCALE + X_OFFSET,
-                y * BLOCK_SCALE + Y_OFFSET,
-                BLOCK_SCALE,
-                BLOCK_SCALE,
-                tetromino_colors[board[y][x]]
-            );
-        }
+        for (size_t x = 0; x < COLS; ++x) DrawRectangle(
+            x * BLOCK_SCALE + X_OFFSET,
+            y * BLOCK_SCALE + Y_OFFSET,
+            BLOCK_SCALE,
+            BLOCK_SCALE,
+            tetromino_colors[board[y][x]]
+        );
     }
 } 
 

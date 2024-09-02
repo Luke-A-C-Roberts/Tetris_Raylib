@@ -374,31 +374,22 @@ unsigned char _count_complete_rows(TetrominoType const board[ROWS][COLS]) {
 // NOTE: This isn't the sort of function that should be run every frame
 //       so is checked with _count_complete_rows first.
 void _remove_completed_rows(TetrominoType board[ROWS][COLS]) {
-    // TODO: Fix This SEGFAULT!
 
-    
-    TetrominoType new_board[ROWS][COLS];
-    // init new board
-    for (size_t y = 0; y < ROWS; ++y) {
-        for (size_t x = 0; x < COLS; ++x) new_board[y][x] = NO_TETROMINO;
-    }
-    
-    // copy non-full rows into new board, skipping removed rows
-    size_t new_board_y = ROWS - 1;
-    for (size_t y = ROWS - 1; y >= 0; --y) {
-        if (!_is_completed_row(board[y])) memcpy(
-            new_board[new_board_y--],
-            board[y],
-            COLS * sizeof(TetrominoType)
-        );
-    }
+    // must be cast to signed long to avoid the while loop from going on forever
+    // in the case of size_t, x >= 0 is always true
+    signed long old_y = ROWS - 1;
+    signed long new_y = ROWS - 1;
+ 
+    while (old_y >= 0 && new_y >= 0) {
+        if (_is_completed_row(board[old_y])) new_y--;
+        // only bother checking if we know new_y hasn't stopped being equal to old_y
+        else if (old_y == new_y) continue;
 
-    // copy back into board (bare in mind array arguments are references)
-    for (size_t y = 0; y < ROWS; ++y) memcpy(
-        board[y],
-        new_board[y],
-        COLS * sizeof(TetrominoType)
-    ); 
+        for (size_t x = 0; x < COLS; ++x)
+            board[old_y][x] = board[new_y][x];
+
+        old_y--; new_y--;
+    }
 }
 
 inline size_t _calc_score(size_t const level, size_t const row_num) {

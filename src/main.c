@@ -22,7 +22,7 @@ int main(void) {
     SetTargetFPS(FPS);
 
     // Gamestate object holds all game objects, and gameloop updates it each cycle
-    GameState game_state = init_gamestate(1UL);
+    GameState game_state = init_gamestate(INIT_LEVEL);
     while (!WindowShouldClose()) {
         double const time = GetTime();
         if (IsKeyPressed(KEY_R)) {
@@ -38,7 +38,7 @@ int main(void) {
             RELOAD_FUNC(display_game);
 
             // DEBUG: refresh game state (optional)
-            game_state = init_gamestate(1UL);
+            game_state = init_gamestate(INIT_LEVEL);
         }
 
         next_gamestate(&game_state); // Update game state

@@ -12,6 +12,9 @@
 #define Y_OFFSET    (size_t) 50
 #define BLOCK_SCALE (size_t) 16
 
+// DEBUG: we will make this one choosable later
+#define INIT_LEVEL  (size_t) 10
+
 typedef char const*const litstr_t;
   
 litstr_t libgame_path = "build/libgame.so";

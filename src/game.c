@@ -382,8 +382,7 @@ void _remove_completed_rows(TetrominoType board[ROWS][COLS]) {
  
     while (old_y >= 0 && new_y >= 0) {
         if (_is_completed_row(board[old_y])) new_y--;
-        // only bother checking if we know new_y hasn't stopped being equal to old_y
-        else if (old_y == new_y) continue;
+        // if (old_y == new_y) continue;
 
         for (size_t x = 0; x < COLS; ++x)
             board[old_y][x] = board[new_y][x];

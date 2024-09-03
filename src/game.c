@@ -290,12 +290,13 @@ inline bool _has_tetromino_landed(
 }
 
 inline size_t _calc_wait(size_t const level) {
-    if      (level < 15UL) return 51UL - (3UL * level);
-    else if (level < 30UL) return 10UL - (level / 4UL);
-    else if (level < 40UL) return 2UL;
-    else                   return 1UL;
+    if      (level < 15) return 51 - (3 * level);
+    else if (level < 30) return 10 - (level / 4);
+    else if (level < 40) return 2;
+    else                 return 1;
 }  
 
+// TODO: delayed autoshift for piece movement (for down this should cancel automatic movement temporarily)
 void _handle_user_input_movement(GameState *const game_state) {
     if (IsKeyPressed(KEY_W)) _rotate_tetromino(
         &game_state->current_tetromino,
@@ -356,33 +357,22 @@ void _handle_tetromino_automatic_movement(GameState *const game_state) {
     )) _deposit_current_tetromino(game_state);
 }   
 
-bool _is_completed_row(TetrominoType const row[COLS]) {
+inline bool _is_completed_row(TetrominoType const row[COLS]) {
     for (size_t x = 0; x < COLS; ++x) {
         if (row[x] == NO_TETROMINO) return false;
     } 
     return true;
 }
 
-unsigned char _count_complete_rows(TetrominoType const board[ROWS][COLS]) {
-    unsigned char count = 0;
-    for (size_t y = 0; y < ROWS; ++y) {
-        if (_is_completed_row(board[y])) count++;
-    } 
-    return count;
-}  
-
-// NOTE: This isn't the sort of function that should be run every frame
-//       so is checked with _count_complete_rows first.
-void _remove_completed_rows(TetrominoType board[ROWS][COLS]) {
-
+// NOTE: This isn't the sort of function that should be run every frame due to computational complexity, so always check if its necessary.
+inline void _remove_completed_rows(TetrominoType board[ROWS][COLS], size_t const start_y) { 
     // must be cast to signed long to avoid the while loop from going on forever
     // in the case of size_t, x >= 0 is always true
-    signed long old_y = ROWS - 1;
-    signed long new_y = ROWS - 1;
+    signed long old_y = start_y;
+    signed long new_y = start_y;
  
     while (old_y >= 0 && new_y >= 0) {
         if (_is_completed_row(board[old_y])) new_y--;
-        // if (old_y == new_y) continue;
 
         for (size_t x = 0; x < COLS; ++x)
             board[old_y][x] = board[new_y][x];
@@ -392,23 +382,25 @@ void _remove_completed_rows(TetrominoType board[ROWS][COLS]) {
 }
 
 inline size_t _calc_score(size_t const level, size_t const row_num) {
-    size_t score = 0;
-
-    switch (row_num) {
-        case 0: break;
-        case 1: score = (level + 1) * 40  ; break;
-        case 2: score = (level + 1) * 100 ; break;
-        case 3: score = (level + 1) * 300 ; break;
-        case 4: score = (level + 1) * 1200; break;
-        default: break;
-    }
-    return score;
+    static short const score_multipliers[5] = {0, 40, 100, 300, 1200};
+    return (level + 1) * score_multipliers[row_num];
 }
 
-void _handle_completed_rows(GameState *const game_state) {
-    size_t completed_rows = _count_complete_rows(game_state->board);
-    if (completed_rows > 0) _remove_completed_rows(game_state->board);
-    game_state->score += _calc_score(game_state->level + 1, completed_rows);
+inline void _handle_completed_rows(GameState *const game_state) { 
+    // to determine if rows need removing and for score calculation
+    unsigned char completed_rows = 0;
+    
+    // for optimising _remove_completed rows by not needing to copy rows before this y
+    size_t max_row_y = 0;
+    for (size_t y = 0; y < ROWS; ++y) {
+        if (_is_completed_row(game_state->board[y])) {
+            max_row_y = y > max_row_y? y : max_row_y;
+            completed_rows++;
+        }
+    }
+    
+    if (completed_rows > 0) _remove_completed_rows(game_state->board, max_row_y);
+    game_state->score += _calc_score(game_state->level, completed_rows);
 }
  
 // Display Functions ////////////////////////////////////////////////////////// 
@@ -470,6 +462,7 @@ GameState init_gamestate(size_t level) {
     return game_state;
 }
   
+// TODO leveling up after a certain score
 void next_gamestate(GameState *const game_state) {
     _handle_user_input_movement(game_state);
     _handle_tetromino_automatic_movement(game_state); 
@@ -477,6 +470,7 @@ void next_gamestate(GameState *const game_state) {
     game_state->frame_number++;
 }
 
+// TODO showing level, score and next piece
 void display_game(GameState const*const game_state) {
     BeginDrawing();
 

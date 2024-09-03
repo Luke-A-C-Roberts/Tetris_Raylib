@@ -462,7 +462,7 @@ GameState init_gamestate(size_t level) {
     return game_state;
 }
   
-// TODO leveling up after a certain score
+// TODO: leveling up after a certain score
 void next_gamestate(GameState *const game_state) {
     _handle_user_input_movement(game_state);
     _handle_tetromino_automatic_movement(game_state); 
@@ -470,7 +470,7 @@ void next_gamestate(GameState *const game_state) {
     game_state->frame_number++;
 }
 
-// TODO showing level, score and next piece
+// TODO: showing level, score and next piece
 void display_game(GameState const*const game_state) {
     BeginDrawing();
 

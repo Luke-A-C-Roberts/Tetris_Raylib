@@ -15,6 +15,7 @@
 #define Y_AXIS                 (size_t) 1
 #define EDGE_SIZE              (size_t) 4
 #define MAX_NUM_ROTATIONS      (size_t) 4 
+#define MAX_COMPLETED_ROWS     (size_t) 4
 #define ROWS                   (size_t) 20
 #define COLS                   (size_t) 10
 #define X_OFFSET               (size_t) 100

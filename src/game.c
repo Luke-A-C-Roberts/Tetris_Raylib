@@ -452,49 +452,56 @@ static void _handle_tetromino_automatic_movement(GameState *const game_state) {
             game_state->board
         )) _deposit_current_tetromino(game_state);
     }
-}    
+}
+
+size_t min(size_t const a, size_t const b) {
+    return a < b? a : b;
+}
+
+size_t max(size_t const a, size_t const b) {
+    return a > b? a : b;
+}
 
 // NOTE: This isn't the sort of function that should be run every frame due to computational complexity, so always check if its necessary.
 static inline void _remove_completed_rows(
     TetrominoType board[ROWS][COLS],
-    size_t const start_y
-) { 
-    // must be cast to signed long to avoid the while loop from going on
-    // forever in the case of size_t, x >= 0 is always true
-    signed long old_y = start_y;
-    signed long new_y = start_y;
- 
-    while (old_y >= 0 && new_y >= 0) {
-        if (_is_completed_row(board[old_y])) new_y--;
+    size_t const num_completed_rows,
+    size_t const completed_rows[MAX_COMPLETED_ROWS]
+) {
+    // TODO: Fix this algorithm!!
+    for (size_t i = 0; i < num_completed_rows; ++i) {
+        size_t const completed_row_y = num_completed_rows - i - 1;
+        size_t const start = i;
+        size_t const end = completed_row_y;
 
-        for (size_t x = 0; x < COLS; ++x)
-            board[old_y][x] = board[new_y][x];
-
-        old_y--; new_y--;
+        for (ptrdiff_t y = end; y >= start; --y) {
+            for (size_t x = 0; x < COLS; ++x) {
+                board[y][x] = board[max(y - 1, 0)][x];
+            }
+        }
     }
 }  
 
 static inline void _handle_completed_rows(GameState *const game_state) { 
-    // to determine if rows need removing and for score calculation
-    unsigned char completed_rows = 0;
-    
-    // for optimising _remove_completed rows by not needing to copy rows
-    // before this y
-    size_t max_row_y = 0;
+    size_t num_completed_rows = 0;
+    size_t completed_rows[MAX_COMPLETED_ROWS] = { 0, 0, 0, 0 };
     for (size_t y = 0; y < ROWS; ++y) {
         if (_is_completed_row(game_state->board[y])) {
-            max_row_y = y > max_row_y? y : max_row_y;
-            completed_rows++;
+            completed_rows[num_completed_rows] = y;
+            num_completed_rows++;
         }
     }
     
     // TODO: Fix piece removal. perhaps get completed rows by index and pass that to `_remove_completed_rows`
-    if (completed_rows > 0)
-        _remove_completed_rows(game_state->board, max_row_y);
+    if (num_completed_rows > 0) _remove_completed_rows(
+        game_state->board,
+        num_completed_rows,
+        completed_rows
+    );
 
-    game_state->score += _calc_score(game_state->level, completed_rows);
-    game_state->lines += completed_rows;
-    game_state->total_lines += completed_rows;
+    game_state->score += _calc_score(game_state->level, num_completed_rows);
+    game_state->lines += num_completed_rows;
+    game_state->total_lines += num_completed_rows;
 }
  
 // changes the level after a certain number of rows have been cleared

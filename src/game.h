@@ -3,19 +3,31 @@
 
 #include "config.h"
 #include <stddef.h>
+#include <stdbool.h>
 #include <time.h>
 
 // 4x4 + 1 for string terminator \0
 // These need to be macros for copy into array declarations
-#define BLOCKS_SIZE 17
-#define NUM_TETROMINO_TYPES 7
-#define NUM_AXIS 2UL
-#define NUM_TETROMINO_BLOCKS 4UL 
-#define X_AXIS 0UL
-#define Y_AXIS 1UL
-#define EDGE_SIZE 4UL
-#define MAX_NUM_ROTATIONS 4UL
-#define NEW_BLOCK_POSITIONS {{0, 0}, {0, 0}, {0, 0}, {0, 0}}
+#define BLOCKS_SIZE            (size_t) 17
+#define NUM_TETROMINO_TYPES    (size_t) 7
+#define NUM_AXIS               (size_t) 2
+#define NUM_TETROMINO_BLOCKS   (size_t) 4 
+#define X_AXIS                 (size_t) 0
+#define Y_AXIS                 (size_t) 1
+#define EDGE_SIZE              (size_t) 4
+#define MAX_NUM_ROTATIONS      (size_t) 4 
+#define ROWS                   (size_t) 20
+#define COLS                   (size_t) 10
+#define X_OFFSET               (size_t) 100
+#define Y_OFFSET               (size_t) 50
+#define BLOCK_SCALE            (size_t) 16 
+#define INFO_X_OFFSET          (size_t) 20
+#define INFO_Y_OFFSET          (size_t) 20
+#define INFO_FONT_SIZE         (size_t) 20
+#define INFO_NEXT_ITEM_X       (size_t) 40
+#define AUTOSHIFT_FRAMES_DELAY (size_t) 20
+#define AUTOSHIFT_FRAMESKIP    (size_t) 3
+#define NEW_BLOCK_POSITIONS  {{0, 0}, {0, 0}, {0, 0}, {0, 0}}
 
 typedef enum {
     L_PIECE,
@@ -53,8 +65,17 @@ typedef struct {
                                      // block color
     size_t level;
     size_t score;
+    size_t line_num;
+    size_t lines;
+    size_t total_lines;
+
     unsigned long long frame_number;
     size_t wait_time;
+
+    bool deposite_on_next_frame;
+    bool delayed_autoshift_pressed_down;
+    size_t delayed_autoshift_frames;
+
 } GameState;
 
 typedef GameState (*init_gamestate_t)(size_t);

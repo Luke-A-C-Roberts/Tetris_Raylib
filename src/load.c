@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <assert.h>
 
-void *dlopen_safe(char const*const file, int const mode) {
+extern void *dlopen_safe(char const*const file, int const mode) {
     void *lib = NULL;
     lib = dlopen(file, mode);
     assert (lib != NULL); 
@@ -12,7 +12,7 @@ void *dlopen_safe(char const*const file, int const mode) {
 }
 
 
-void *dlsym_safe(void *restrict const handle, char *restrict const name) {
+extern void *dlsym_safe(void *restrict const handle, char *restrict const name) {
     void *ptr = NULL;
     ptr = dlsym(handle, name);
     assert (ptr != NULL);

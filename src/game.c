@@ -8,7 +8,7 @@
 #include <string.h>
 
 // Data ///////////////////////////////////////////////////////////////////////
-char const tetromino_templates[NUM_TETROMINO_TYPES][BLOCKS_SIZE] = {
+static char const tetromino_templates[NUM_TETROMINO_TYPES][BLOCKS_SIZE] = {
     "XX  "
     " X  "
     " X  "
@@ -45,10 +45,10 @@ char const tetromino_templates[NUM_TETROMINO_TYPES][BLOCKS_SIZE] = {
     "    "
 };
 
-unsigned char const tetromino_rotate_sizes[NUM_TETROMINO_TYPES]
+static unsigned char const tetromino_rotate_sizes[NUM_TETROMINO_TYPES]
     = {3, 3, 3, 2, 4, 3, 3};
 
-Color const tetromino_colors[NUM_TETROMINO_TYPES]
+static Color const tetromino_colors[NUM_TETROMINO_TYPES]
     = {RED, YELLOW, GREEN, LIME, PURPLE, GOLD, SKYBLUE };
 
 // Private Functions ////////////////////////////////////////////////////////// 
@@ -56,7 +56,7 @@ static inline TetrominoType _random_tetromino_type(void) {
     return GetRandomValue(first_random_tetromino, last_random_tetromino);
 }
 
-inline void _init_tetromino_block_positions(Tetromino *const tetromino) {
+static inline void _init_tetromino_block_positions(Tetromino *const tetromino) {
     size_t position_index = 0;
     char const*const template = (tetromino_templates[tetromino->type]);
     for (size_t i = 0; i < BLOCKS_SIZE - 1; ++i) {
@@ -72,7 +72,7 @@ inline void _init_tetromino_block_positions(Tetromino *const tetromino) {
     }
 } 
 
-inline Tetromino _new_tetromino(TetrominoType type) { 
+static inline Tetromino _new_tetromino(TetrominoType type) { 
     long const y_offset = type == T_PIECE? -1L : 0L;
     Tetromino tetromino = {
         .x = COLS / 2 - 1,
@@ -87,7 +87,7 @@ inline Tetromino _new_tetromino(TetrominoType type) {
 }
 
 // Tetromino Movement /////////////////////////////////////////////////////////
-inline void _rotate_temp_positions(
+static inline void _rotate_temp_positions(
     unsigned char const rotation_size,
     size_t const tetromino_positions[NUM_TETROMINO_BLOCKS][NUM_AXIS],
     size_t temp_positions[NUM_TETROMINO_BLOCKS][NUM_AXIS]
@@ -104,19 +104,19 @@ inline void _rotate_temp_positions(
 }
  
 // NOTE: Only use these for rotation adjustment
-inline void _move_tetromino_relative_up(
+static inline void _move_tetromino_relative_up(
     size_t positions[NUM_TETROMINO_BLOCKS][NUM_AXIS]
 ) {
     for (size_t i = 0; i < NUM_TETROMINO_BLOCKS; ++i) positions[i][Y_AXIS]--; 
 }
 
-inline void _move_tetromino_relative_left(
+static inline void _move_tetromino_relative_left(
     size_t positions[NUM_TETROMINO_BLOCKS][NUM_AXIS]
 ) {
     for (size_t i = 0; i < NUM_TETROMINO_BLOCKS; ++i) positions[i][X_AXIS]--; 
 }
 
-inline void _handle_2_by_3_piece_reajustment(
+static inline void _handle_2_by_3_piece_reajustment(
     size_t const rotation,
     size_t positions[NUM_TETROMINO_BLOCKS][NUM_AXIS]
 ) {
@@ -124,7 +124,7 @@ inline void _handle_2_by_3_piece_reajustment(
     if (rotation % 2 == 0) _move_tetromino_relative_up(positions);
 }
 
-inline void _handle_I_piece_reajustment(
+static inline void _handle_I_piece_reajustment(
     size_t const rotation,
     size_t positions[NUM_TETROMINO_BLOCKS][NUM_AXIS]
 ) { 
@@ -133,7 +133,7 @@ inline void _handle_I_piece_reajustment(
     if (rotation % 2 == 0) _move_tetromino_relative_left(positions); 
 }
 
-void _handle_rotation_adjustment(
+static void _handle_rotation_adjustment(
     TetrominoType const type,
     size_t const rotation,
     size_t positions[NUM_TETROMINO_BLOCKS][NUM_AXIS] 
@@ -182,14 +182,14 @@ void _handle_rotation_adjustment(
 }
 
 // See definition in Events section
-bool _has_tetromino_collided(
+static bool _has_tetromino_collided(
     size_t const x,
     size_t const y,
     size_t const positions[NUM_TETROMINO_BLOCKS][NUM_AXIS],
     TetrominoType const board[ROWS][COLS] 
 );
 
-void _rotate_tetromino(
+static void _rotate_tetromino(
     Tetromino *const tetromino,
     TetrominoType const board[ROWS][COLS]
 ) {
@@ -230,7 +230,7 @@ void _rotate_tetromino(
     tetromino->rotation %= 4;
 }
 
-void _move_tetromino(
+static void _move_tetromino(
     MoveDirection const move_direction,
     Tetromino *const tetromino,
     TetrominoType const board[ROWS][COLS] 
@@ -257,7 +257,7 @@ void _move_tetromino(
 }
 
 // Event Functions ////////////////////////////////////////////////////////////
-inline bool _has_tetromino_collided(
+static inline bool _has_tetromino_collided(
     size_t const x,
     size_t const y,
     size_t const positions[NUM_TETROMINO_BLOCKS][NUM_AXIS],
@@ -272,7 +272,7 @@ inline bool _has_tetromino_collided(
     return false;
 }
 
-inline bool _has_tetromino_landed(
+static inline bool _has_tetromino_landed(
     size_t const x,
     size_t const y,
     size_t const positions[NUM_TETROMINO_BLOCKS][NUM_AXIS],
@@ -289,15 +289,14 @@ inline bool _has_tetromino_landed(
     return true;
 }
 
-inline size_t _calc_wait(size_t const level) {
+static inline size_t _calc_wait(size_t const level) {
     if      (level < 15) return 51 - (3 * level);
     else if (level < 30) return 10 - (level / 4);
     else if (level < 40) return 2;
     else                 return 1;
 }  
 
-// TODO: delayed autoshift for piece movement (for down this should cancel automatic movement temporarily)
-void _handle_user_input_movement(GameState *const game_state) {
+static void _handle_user_input_movement(GameState *const game_state) {
     if (IsKeyPressed(KEY_W)) _rotate_tetromino(
         &game_state->current_tetromino,
         game_state->board
@@ -321,9 +320,57 @@ void _handle_user_input_movement(GameState *const game_state) {
         &game_state->current_tetromino,
         game_state->board
     );   
+
+    // Delayed autoshift or DAS
+    // after an initial press, wait and then start moving repeatedly much
+    // faster. This is handled by a frame counter
+    if (IsKeyDown(KEY_A)) {
+        game_state->delayed_autoshift_frames++;
+        game_state->delayed_autoshift_pressed_down = false;
+        if (game_state->delayed_autoshift_frames > AUTOSHIFT_FRAMES_DELAY
+        &&  game_state->frame_number % AUTOSHIFT_FRAMESKIP == 0
+        ) {
+            _move_tetromino( 
+                MOVE_LEFT,
+                &game_state->current_tetromino,
+                game_state->board
+            );
+        
+        }
+    }
+    else if (IsKeyDown(KEY_D)) {
+        game_state->delayed_autoshift_frames++;
+        game_state->delayed_autoshift_pressed_down = false;
+        if (game_state->delayed_autoshift_frames > AUTOSHIFT_FRAMES_DELAY
+        &&  game_state->frame_number % AUTOSHIFT_FRAMESKIP == 0
+        ) {
+            _move_tetromino( 
+                MOVE_RIGHT,
+                &game_state->current_tetromino,
+                game_state->board
+            ); 
+        }
+    }
+    else if (IsKeyDown(KEY_S)) {
+        game_state->delayed_autoshift_frames++;
+        if (game_state->delayed_autoshift_frames > AUTOSHIFT_FRAMES_DELAY
+        &&  game_state->frame_number % AUTOSHIFT_FRAMESKIP == 0
+        ) {
+            game_state->delayed_autoshift_pressed_down = true;
+            _move_tetromino( 
+                MOVE_DOWN,
+                &game_state->current_tetromino,
+                game_state->board
+            ); 
+        }
+    } 
+    else {
+        game_state->delayed_autoshift_frames = 0;
+        game_state->delayed_autoshift_pressed_down = false;
+    } 
 }
 
-void _deposit_current_tetromino(GameState *const game_state) {
+static void _deposit_current_tetromino(GameState *const game_state) {
     Tetromino const*const tetromino = &game_state->current_tetromino;
     size_t const x_offset = tetromino->x;
     size_t const y_offset = tetromino->y;
@@ -338,26 +385,40 @@ void _deposit_current_tetromino(GameState *const game_state) {
     game_state->next_tetromino = _random_tetromino_type();
 }
 
-void _handle_tetromino_automatic_movement(GameState *const game_state) {
+static void _handle_tetromino_automatic_movement(GameState *const game_state) {
+ 
     // is this frame one where it moves down?
     if (game_state->frame_number % game_state->wait_time != 0) return; 
 
-    _move_tetromino( 
+    // if the player is holding down then we dont need to automatically make
+    // the piece move down.
+    if (!game_state->delayed_autoshift_pressed_down) _move_tetromino( 
         MOVE_DOWN,
         &game_state->current_tetromino,
         game_state->board
     );
 
+    // in order to give an extra frame to the player deposite_on_next_frame
+    // is used.
     Tetromino const*const tetromino = &game_state->current_tetromino;
     if (_has_tetromino_landed(
         tetromino->x,
         tetromino->y,
         tetromino->positions,
-        game_state->board
-    )) _deposit_current_tetromino(game_state);
+        game_state->board)
+    &&  !(game_state->deposite_on_next_frame)
+    ) {
+        game_state->deposite_on_next_frame = true;
+        return;
+    }
+    
+    if (game_state->deposite_on_next_frame) {
+        _deposit_current_tetromino(game_state);
+        game_state->deposite_on_next_frame = false;
+    }
 }   
 
-inline bool _is_completed_row(TetrominoType const row[COLS]) {
+static inline bool _is_completed_row(TetrominoType const row[COLS]) {
     for (size_t x = 0; x < COLS; ++x) {
         if (row[x] == NO_TETROMINO) return false;
     } 
@@ -365,9 +426,12 @@ inline bool _is_completed_row(TetrominoType const row[COLS]) {
 }
 
 // NOTE: This isn't the sort of function that should be run every frame due to computational complexity, so always check if its necessary.
-inline void _remove_completed_rows(TetrominoType board[ROWS][COLS], size_t const start_y) { 
-    // must be cast to signed long to avoid the while loop from going on forever
-    // in the case of size_t, x >= 0 is always true
+static inline void _remove_completed_rows(
+    TetrominoType board[ROWS][COLS],
+    size_t const start_y
+) { 
+    // must be cast to signed long to avoid the while loop from going on
+    // forever in the case of size_t, x >= 0 is always true
     signed long old_y = start_y;
     signed long new_y = start_y;
  
@@ -381,16 +445,17 @@ inline void _remove_completed_rows(TetrominoType board[ROWS][COLS], size_t const
     }
 }
 
-inline size_t _calc_score(size_t const level, size_t const row_num) {
+static inline size_t _calc_score(size_t const level, size_t const row_num) {
     static short const score_multipliers[5] = {0, 40, 100, 300, 1200};
     return (level + 1) * score_multipliers[row_num];
 }
 
-inline void _handle_completed_rows(GameState *const game_state) { 
+static inline void _handle_completed_rows(GameState *const game_state) { 
     // to determine if rows need removing and for score calculation
     unsigned char completed_rows = 0;
     
-    // for optimising _remove_completed rows by not needing to copy rows before this y
+    // for optimising _remove_completed rows by not needing to copy rows
+    // before this y
     size_t max_row_y = 0;
     for (size_t y = 0; y < ROWS; ++y) {
         if (_is_completed_row(game_state->board[y])) {
@@ -399,12 +464,30 @@ inline void _handle_completed_rows(GameState *const game_state) {
         }
     }
     
-    if (completed_rows > 0) _remove_completed_rows(game_state->board, max_row_y);
+    if (completed_rows > 0)
+        _remove_completed_rows(game_state->board, max_row_y);
+
     game_state->score += _calc_score(game_state->level, completed_rows);
+    game_state->lines += completed_rows;
+    game_state->total_lines += completed_rows;
+}
+
+static inline size_t _calc_first_line_num(size_t const start_level) {
+    return 10 * start_level + 10;
+} 
+
+static inline void _handle_level(GameState *const game_state) {
+    if (game_state->lines >= game_state->line_num) {
+        game_state->line_num = 10;
+        game_state->lines = 0;
+        game_state->level++;
+    }
 }
  
 // Display Functions ////////////////////////////////////////////////////////// 
-inline void _disp_current_tetromino(Tetromino const*const restrict tetromino) {
+static inline void _disp_current_tetromino(
+    Tetromino const*const restrict tetromino
+) {
     Color const color = tetromino_colors[tetromino->type]; 
     size_t const x_offset = tetromino->x;    
     size_t const y_offset = tetromino->y;
@@ -422,7 +505,7 @@ inline void _disp_current_tetromino(Tetromino const*const restrict tetromino) {
     }
 }
 
-inline void _disp_boarders(void) {
+static inline void _disp_boarders(void) {
     size_t const cols_mul = COLS * BLOCK_SCALE + X_OFFSET;
     size_t const rows_mul = ROWS * BLOCK_SCALE + Y_OFFSET; 
     DrawLine(X_OFFSET, Y_OFFSET, cols_mul, Y_OFFSET, BLACK);
@@ -431,7 +514,7 @@ inline void _disp_boarders(void) {
     DrawLine(X_OFFSET, rows_mul, cols_mul, rows_mul, BLACK);  
 }
 
-inline void _disp_blocks(TetrominoType const board[ROWS][COLS]) {
+static inline void _disp_blocks(TetrominoType const board[ROWS][COLS]) {
     for (size_t y = 0; y < ROWS; ++y) {
         for (size_t x = 0; x < COLS; ++x) DrawRectangle(
             x * BLOCK_SCALE + X_OFFSET,
@@ -443,15 +526,41 @@ inline void _disp_blocks(TetrominoType const board[ROWS][COLS]) {
     }
 } 
 
+// static inline void _disp_info(size_t const level, size_t const score) {
+static inline void _disp_info(GameState const*const gamestate) {
+    static char temp_str[20];
+    sprintf(temp_str, "%lu", gamestate->level);
+    DrawText(
+        temp_str,
+        INFO_X_OFFSET,
+        INFO_Y_OFFSET,
+        INFO_FONT_SIZE,
+        BLACK
+    );
+
+    sprintf(temp_str, "%lu", gamestate->score);
+    DrawText(
+        temp_str,
+        INFO_X_OFFSET + INFO_NEXT_ITEM_X * 1,
+        INFO_Y_OFFSET,
+        INFO_FONT_SIZE,
+        BLACK
+    ); 
+}
+
 // Exposed Functions //////////////////////////////////////////////////////////
-GameState init_gamestate(size_t level) {
+extern GameState init_gamestate(size_t level) {
     GameState game_state = {
         .current_tetromino = _new_tetromino(_random_tetromino_type()),
         .next_tetromino = _random_tetromino_type(),
         .level = level,
-        .score = 0UL,
+        // .score = 0UL,
+        .line_num = _calc_first_line_num(level),
         .frame_number = 1UL,
-        .wait_time = _calc_wait(level)
+        .wait_time = _calc_wait(level),
+        // .deposite_on_next_frame = false,
+        // .delayed_autoshift_pressed_down = false,
+        // .delayed_autoshift_frames = 0UL,
     };
 
     for (size_t y = 0; y < ROWS; ++y) {
@@ -462,22 +571,22 @@ GameState init_gamestate(size_t level) {
     return game_state;
 }
   
-// TODO: leveling up after a certain score
-void next_gamestate(GameState *const game_state) {
+extern void next_gamestate(GameState *const game_state) {
     _handle_user_input_movement(game_state);
     _handle_tetromino_automatic_movement(game_state); 
     _handle_completed_rows(game_state);
+    _handle_level(game_state);
     game_state->frame_number++;
 }
 
-// TODO: showing level, score and next piece
-void display_game(GameState const*const game_state) {
+extern void display_game(GameState const*const game_state) {
     BeginDrawing();
 
     ClearBackground(GRAY);
     _disp_boarders();
     _disp_blocks(game_state->board);
     _disp_current_tetromino(&game_state->current_tetromino);
+    _disp_info(game_state);
     
     EndDrawing();
 }

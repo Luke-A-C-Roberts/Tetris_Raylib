@@ -12,9 +12,9 @@ int main(void) {
     void *libgame = dlopen_safe(libgame_path, RTLD_NOW);
 
     // Macro that loads functions safely (see load.h)
-    LOAD_FUNC(init_gamestate);
-    LOAD_FUNC(next_gamestate);
-    LOAD_FUNC(display_game);
+    LOAD_FUNC(libgame, init_gamestate);
+    LOAD_FUNC(libgame, next_gamestate);
+    LOAD_FUNC(libgame, display_game);
     
     // Initialises raylib state to configure window
     InitWindow(INIT_WIDTH, INIT_HEIGHT, "Game!");
@@ -33,9 +33,9 @@ int main(void) {
             libgame = dlopen_safe(libgame_path, RTLD_NOW); 
 
             // reload functions
-            RELOAD_FUNC(init_gamestate);
-            RELOAD_FUNC(next_gamestate);
-            RELOAD_FUNC(display_game);
+            RELOAD_FUNC(libgame, init_gamestate);
+            RELOAD_FUNC(libgame, next_gamestate);
+            RELOAD_FUNC(libgame, display_game);
 
             // DEBUG: refresh game state (optional)
             game_state = init_gamestate(INIT_LEVEL);

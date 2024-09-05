@@ -42,8 +42,10 @@ int main(void) {
             game_state = init_gamestate(INIT_LEVEL);
         } 
 
-        next_gamestate(&game_state); // Update game state
+        bool is_game_over = next_gamestate(&game_state); // Update game state
         display_game(&game_state);   // Take gamestate and render it
+
+        if (is_game_over) break;
 
         if (IsKeyPressed(KEY_P)) {
             printf("============== DEBUG INFO =============\n\n");

@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#define TO_BOOL_STR ? "true" : false
+#define TO_BOOL_STR(b) (b)? "true" : false
 
 static inline void _generate_tetromino_type_str(char *const tetromino_type_str, TetrominoType const tetromino_type) {
     switch (tetromino_type) {
@@ -42,8 +42,8 @@ extern void print_game_state(GameState const*const game_state) {
     fprintf(stderr, "wait_time = %zu\n", game_state->wait_time);
     fprintf(stderr, "frame_number = %llu\n", game_state->frame_number);
     fprintf(stderr, "delayed_autoshift_frames = %zu\n", game_state->delayed_autoshift_frames); 
-    fprintf(stderr, "deposite_on_next_frame = %s\n", game_state->deposite_on_next_frame TO_BOOL_STR);
-    fprintf(stderr, "delayed_autoshift_pressed_down = %s\n", game_state->delayed_autoshift_pressed_down TO_BOOL_STR);
+    fprintf(stderr, "deposite_on_next_frame = %s\n", TO_BOOL_STR(game_state->deposite_on_next_frame));
+    fprintf(stderr, "delayed_autoshift_pressed_down = %s\n", TO_BOOL_STR(game_state->delayed_autoshift_pressed_down));
 
     fprintf(stderr, "\ncurrent_tetromino:\n"); 
     fprintf(stderr, "\tx = %zu\n", game_state->current_tetromino.x);

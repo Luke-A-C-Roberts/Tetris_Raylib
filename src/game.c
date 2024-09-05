@@ -452,8 +452,7 @@ static void _handle_tetromino_automatic_movement(GameState *const game_state) {
             game_state->board
         )) _deposit_current_tetromino(game_state);
     }
-}   
-
+}    
 
 // NOTE: This isn't the sort of function that should be run every frame due to computational complexity, so always check if its necessary.
 static inline void _remove_completed_rows(
@@ -473,9 +472,7 @@ static inline void _remove_completed_rows(
 
         old_y--; new_y--;
     }
-}
-
-
+}  
 
 static inline void _handle_completed_rows(GameState *const game_state) { 
     // to determine if rows need removing and for score calculation
@@ -554,7 +551,7 @@ static inline void _disp_blocks(TetrominoType const board[ROWS][COLS]) {
 
 static inline void _disp_info(GameState const*const gamestate) {
     static char temp_str[20];
-    sprintf(temp_str, "%lu", gamestate->level);
+    sprintf(temp_str, "%zu", gamestate->level);
     DrawText(
         temp_str,
         INFO_X_OFFSET,
@@ -563,7 +560,7 @@ static inline void _disp_info(GameState const*const gamestate) {
         BLACK
     );
 
-    sprintf(temp_str, "%lu", gamestate->score);
+    sprintf(temp_str, "%zu", gamestate->score);
     DrawText(
         temp_str,
         INFO_X_OFFSET + INFO_NEXT_ITEM_X * 1,
@@ -583,6 +580,8 @@ extern GameState init_gamestate(size_t level) {
         .line_num = _calc_first_line_num(level),
         .frame_number = 1UL,
         .wait_time = _calc_wait(level),
+        .deposite_on_next_frame = false,
+        .delayed_autoshift_pressed_down = false
     };
 
     for (size_t y = 0; y < ROWS; ++y) {
@@ -593,12 +592,19 @@ extern GameState init_gamestate(size_t level) {
     return game_state;
 }
   
-extern void next_gamestate(GameState *const game_state) {
+extern bool next_gamestate(GameState *const game_state) {
     _handle_user_input_movement(game_state);
     _handle_tetromino_automatic_movement(game_state); 
     _handle_completed_rows(game_state);
     _handle_level(game_state);
     game_state->frame_number++;
+
+    return _has_tetromino_collided(
+        game_state->current_tetromino.x,
+        game_state->current_tetromino.y,
+        game_state->current_tetromino.positions,
+        game_state->board
+    );
 }
 
 extern void display_game(GameState const*const game_state) {

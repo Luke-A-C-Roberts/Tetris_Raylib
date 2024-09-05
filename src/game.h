@@ -78,7 +78,7 @@ typedef struct {
 } GameState;
 
 typedef GameState (*init_gamestate_t)(size_t);
-typedef void (*next_gamestate_t)(GameState*);
+typedef bool (*next_gamestate_t)(GameState*);
 typedef void (*display_game_t)(GameState*);
   
 #endif //GAME_H 

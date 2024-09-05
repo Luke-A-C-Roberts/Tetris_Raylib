@@ -1,6 +1,7 @@
 #include "game.h"
 #include "config.h"
 #include "load.h"
+#include "debug.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <raylib.h>
@@ -39,10 +40,16 @@ int main(void) {
 
             // DEBUG: refresh game state (optional)
             game_state = init_gamestate(INIT_LEVEL);
-        }
+        } 
 
         next_gamestate(&game_state); // Update game state
         display_game(&game_state);   // Take gamestate and render it
+
+        if (IsKeyPressed(KEY_P)) {
+            printf("============== DEBUG INFO =============\n\n");
+            print_game_state(&game_state);
+        }
+
         double const time_delta = GetTime() - time;
         WaitTime(1. / GetFPS() - time_delta);
     }

@@ -1,7 +1,6 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include "config.h"
 #include <stddef.h>
 #include <stdbool.h>
 #include <time.h>

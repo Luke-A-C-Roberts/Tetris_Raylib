@@ -3,8 +3,8 @@
 
 #include <stddef.h>
 
-#define INIT_WIDTH     (size_t) 600
-#define INIT_HEIGHT    (size_t) 450
+#define INIT_WIDTH     (size_t) 1000
+#define INIT_HEIGHT    (size_t) 700
 #define FPS            (size_t) 60
 
 // DEBUG: we will make this one choosable later

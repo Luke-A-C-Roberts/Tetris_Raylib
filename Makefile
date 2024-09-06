@@ -3,8 +3,6 @@ FLAGS   := -Wall -Wextra -Wpedantic -g -Og
 LIBS    := -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
 
 default:
-	# mkdir -p ./build
-	# $(COMPILER) $(FLAGS) -shared -fPIC -o ./build/libgame.so ./src/game.c $(LIBS)
 	make game
 	$(COMPILER) $(FLAGS) -o tetris ./src/load.c ./src/debug.c ./src/main.c $(LIBS)
 

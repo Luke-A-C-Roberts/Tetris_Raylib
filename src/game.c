@@ -323,25 +323,33 @@ static inline bool _is_completed_row(TetrominoType const row[COLS]) {
 
 // Tetromino movement /////////////////////////////////////////////////////////
 static void _handle_user_input_movement(GameState *const game_state) {
-    if (IsKeyPressed(KEY_W)) _rotate_tetromino(
+    if (IsKeyPressed(KEY_W)
+    || IsGamepadButtonPressed(GAME_PAD, GAMEPAD_BUTTON_RIGHT_FACE_DOWN)
+    ) _rotate_tetromino(
         &game_state->current_tetromino,
         game_state->board
     );
 
-    else if (IsKeyPressed(KEY_A)) _move_tetromino( 
+    else if (IsKeyPressed(KEY_A)
+         || IsGamepadButtonPressed(GAME_PAD, GAMEPAD_BUTTON_LEFT_FACE_LEFT)
+    ) _move_tetromino( 
         MOVE_LEFT,
         &game_state->current_tetromino,
         game_state->board
     );
 
-    else if (IsKeyPressed(KEY_D)) _move_tetromino( 
+    else if (IsKeyPressed(KEY_D)
+         || IsGamepadButtonPressed(GAME_PAD, GAMEPAD_BUTTON_LEFT_FACE_RIGHT)
+    ) _move_tetromino( 
         MOVE_RIGHT,
         &game_state->current_tetromino,
         game_state->board
     );
     
 
-    else if (IsKeyPressed(KEY_S)) _move_tetromino( 
+    else if (IsKeyPressed(KEY_S)
+         || IsGamepadButtonPressed(GAME_PAD, GAMEPAD_BUTTON_LEFT_FACE_DOWN)
+    ) _move_tetromino( 
         MOVE_DOWN,
         &game_state->current_tetromino,
         game_state->board
@@ -350,7 +358,9 @@ static void _handle_user_input_movement(GameState *const game_state) {
     // Delayed autoshift or DAS
     // after an initial press, wait and then start moving repeatedly much
     // faster. This is handled by a frame counter `delayed_autoshift_frames`
-    if (IsKeyDown(KEY_A)) {
+    if (IsKeyDown(KEY_A)
+    || IsGamepadButtonDown(GAME_PAD, GAMEPAD_BUTTON_LEFT_FACE_LEFT)
+    ) {
         game_state->delayed_autoshift_frames++;
         game_state->delayed_autoshift_pressed_down = false;
         if (game_state->delayed_autoshift_frames > AUTOSHIFT_FRAMES_DELAY
@@ -364,7 +374,9 @@ static void _handle_user_input_movement(GameState *const game_state) {
         
         }
     }
-    else if (IsKeyDown(KEY_D)) {
+    else if (IsKeyDown(KEY_D)
+          || IsGamepadButtonDown(GAME_PAD, GAMEPAD_BUTTON_LEFT_FACE_RIGHT)
+    ) {
         game_state->delayed_autoshift_frames++;
         game_state->delayed_autoshift_pressed_down = false;
         if (game_state->delayed_autoshift_frames > AUTOSHIFT_FRAMES_DELAY
@@ -377,7 +389,9 @@ static void _handle_user_input_movement(GameState *const game_state) {
             ); 
         }
     }
-    else if (IsKeyDown(KEY_S)) {
+    else if (IsKeyDown(KEY_S)
+         || IsGamepadButtonDown(GAME_PAD, GAMEPAD_BUTTON_LEFT_FACE_DOWN)
+    ) {
         game_state->delayed_autoshift_frames++;
         if (game_state->delayed_autoshift_frames > AUTOSHIFT_FRAMES_DELAY
         &&  game_state->frame_number % AUTOSHIFT_FRAMESKIP == 0
@@ -483,7 +497,6 @@ static inline void _handle_completed_rows(GameState *const game_state) {
         }
     }
     
-    // TODO: Fix piece removal. perhaps get completed rows by index and pass that to `_remove_completed_rows`
     if (num_completed_rows > 0) _remove_completed_rows(
         game_state->board,
         num_completed_rows,
@@ -509,6 +522,7 @@ static inline void _handle_level(GameState *const game_state) {
 extern GameState init_gamestate(size_t level) {
     // When defining structs in c all other fields are set to 0
     GameState game_state = {
+        .display_mode = WIREFRAME_DISPLAY_MODE,
         .current_tetromino = _new_tetromino(_random_tetromino_type()),
         .next_tetromino = _random_tetromino_type(),
         .level = level,

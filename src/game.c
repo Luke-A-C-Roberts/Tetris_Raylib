@@ -28,6 +28,10 @@ static inline size_t _calc_score(size_t const level, size_t const row_num) {
     static short const score_multipliers[5] = {0, 40, 100, 300, 1200};
     return (level + 1) * score_multipliers[row_num];
 }
+ 
+static inline size_t min(size_t const a, size_t const b) {
+    return a < b? a : b;
+} 
 
 // Tetromino Initialisation ///////////////////////////////////////////////////
 static char const tetromino_templates[NUM_TETROMINO_TYPES][BLOCKS_SIZE] = {
@@ -70,8 +74,8 @@ static char const tetromino_templates[NUM_TETROMINO_TYPES][BLOCKS_SIZE] = {
 static unsigned char const tetromino_rotate_sizes[NUM_TETROMINO_TYPES]
     = {3, 3, 3, 2, 4, 3, 3};
 
-static Color const tetromino_colors[NUM_TETROMINO_TYPES]
-    = {RED, YELLOW, GREEN, LIME, PURPLE, GOLD, SKYBLUE };
+static Color const tetromino_colors[NUM_TETROMINO_TYPES + 1]
+    = {RED, YELLOW, GREEN, LIME, PURPLE, GOLD, SKYBLUE, GRAY};
 
 static inline TetrominoType _random_tetromino_type(void) {
     return GetRandomValue(first_random_tetromino, last_random_tetromino);
@@ -454,14 +458,6 @@ static void _handle_tetromino_automatic_movement(GameState *const game_state) {
     }
 }
 
-static inline size_t min(size_t const a, size_t const b) {
-    return a < b? a : b;
-}
-
-static inline size_t max(size_t const a, size_t const b) {
-    return a > b? a : b;
-}
-
 // NOTE: This isn't the sort of function that should be run every frame due to computational complexity, so always check if its necessary.
 static inline void _remove_completed_rows(
     TetrominoType board[ROWS][COLS],
@@ -620,8 +616,8 @@ extern void display_game(GameState const*const game_state) {
     BeginDrawing();
 
     ClearBackground(GRAY);
-    _disp_boarders();
     _disp_blocks(game_state->board);
+    _disp_boarders();
     _disp_current_tetromino(&game_state->current_tetromino);
     _disp_info(game_state);
     

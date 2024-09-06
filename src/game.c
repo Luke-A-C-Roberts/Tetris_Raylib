@@ -461,12 +461,8 @@ static inline void _remove_completed_rows(
     size_t const num_completed_rows,
     size_t completed_rows[MAX_COMPLETED_ROWS]
 ) {
-    for (ptrdiff_t i = num_completed_rows - 1; i >= 0; --i) {
-        fprintf(stderr, "i = %ld\n", i);
-
-        for (ptrdiff_t y = min(completed_rows[i], ROWS) - 1; y >= 1; --y) {
-            fprintf(stderr, "y = %ld\n", y);
-
+    for (ptrdiff_t i = num_completed_rows - 1; i >= 0; --i) { 
+        for (ptrdiff_t y = min(completed_rows[i], ROWS) - 1; y >= 1; --y) { 
             for (size_t x = 0; x < COLS; ++x) {
                 board[y + 1][x] = board[y][x];
             }

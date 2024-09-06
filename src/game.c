@@ -454,11 +454,11 @@ static void _handle_tetromino_automatic_movement(GameState *const game_state) {
     }
 }
 
-size_t min(size_t const a, size_t const b) {
+static inline size_t min(size_t const a, size_t const b) {
     return a < b? a : b;
 }
 
-size_t max(size_t const a, size_t const b) {
+static inline size_t max(size_t const a, size_t const b) {
     return a > b? a : b;
 }
 
@@ -466,18 +466,20 @@ size_t max(size_t const a, size_t const b) {
 static inline void _remove_completed_rows(
     TetrominoType board[ROWS][COLS],
     size_t const num_completed_rows,
-    size_t const completed_rows[MAX_COMPLETED_ROWS]
+    size_t completed_rows[MAX_COMPLETED_ROWS]
 ) {
-    // TODO: Fix this algorithm!!
-    for (size_t i = 0; i < num_completed_rows; ++i) {
-        size_t const completed_row_y = num_completed_rows - i - 1;
-        size_t const start = i;
-        size_t const end = completed_row_y;
+    for (ptrdiff_t i = num_completed_rows - 1; i >= 0; --i) {
+        fprintf(stderr, "i = %ld\n", i);
 
-        for (ptrdiff_t y = end; y >= start; --y) {
+        for (ptrdiff_t y = min(completed_rows[i], ROWS) - 1; y >= 1; --y) {
+            fprintf(stderr, "y = %ld\n", y);
+
             for (size_t x = 0; x < COLS; ++x) {
-                board[y][x] = board[max(y - 1, 0)][x];
+                board[y + 1][x] = board[y][x];
             }
+        }
+        for (size_t j = 0; j < MAX_COMPLETED_ROWS; ++j) {
+            completed_rows[j]++;
         }
     }
 }  

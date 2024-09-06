@@ -1,7 +1,6 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include "config.h"
 #include <stddef.h>
 #include <stdbool.h>
 #include <time.h>
@@ -16,6 +15,7 @@
 #define Y_AXIS                 (size_t) 1
 #define EDGE_SIZE              (size_t) 4
 #define MAX_NUM_ROTATIONS      (size_t) 4 
+#define MAX_COMPLETED_ROWS     (size_t) 4
 #define ROWS                   (size_t) 20
 #define COLS                   (size_t) 10
 #define X_OFFSET               (size_t) 100
@@ -79,7 +79,7 @@ typedef struct {
 } GameState;
 
 typedef GameState (*init_gamestate_t)(size_t);
-typedef void (*next_gamestate_t)(GameState*);
+typedef bool (*next_gamestate_t)(GameState*);
 typedef void (*display_game_t)(GameState*);
   
 #endif //GAME_H 
